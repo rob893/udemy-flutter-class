@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import './question.dart';
-import './answer.dart';
+import './quiz.dart';
+import './result.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,40 +17,58 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final _questions = const [
+    {
+      'questionText': 'What is your favorite color?',
+      'answers': [
+        {'text': 'Red', 'score': 5},
+        {'text': 'Green', 'score': 6},
+        {'text': 'Yellow', 'score': 2},
+        {'text': 'Blue', 'score': 9},
+      ]
+    },
+    {
+      'questionText': 'What is your favorite animal?',
+      'answers': [
+        {'text': 'Cat', 'score': 5},
+        {'text': 'Dog', 'score': 6},
+        {'text': 'Frog', 'score': 2},
+        {'text': 'Bug', 'score': 9},
+      ]
+    },
+  ];
+
   int _questionIndex = 0;
 
-  void _answerQuestion() {
+  int _totalScore = 0;
+
+  void _answerQuestion(int score) {
     setState(() {
       _questionIndex++;
+      _totalScore += score;
+    });
+  }
+
+  void _resetQuiz() {
+    setState(() {
+      _questionIndex = 0;
+      _totalScore = 0;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    var questions = [
-      {
-        'questionText': 'What is your favorite color?',
-        'answers': ['Red', 'Green', 'Blue', 'Yellow']
-      },
-      {
-        'questionText': 'What is your favorite animal?',
-        'answers': ['Cat', 'Dog', 'Frog', 'Bug']
-      },
-    ];
-
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
           title: const Text('FART'),
         ),
-        body: Column(
-          children: [
-            Question(questions[_questionIndex]['questionText'] as String),
-            ...(questions[_questionIndex]['answers'] as List<String>)
-                .map((answer) => Answer(_answerQuestion, answer))
-                .toList(),
-          ],
-        ),
+        body: _questionIndex < _questions.length
+            ? Quiz(
+                questions: _questions,
+                answerQuestion: _answerQuestion,
+                questionIndex: _questionIndex)
+            : Result(_totalScore, _resetQuiz),
       ),
     );
   }
